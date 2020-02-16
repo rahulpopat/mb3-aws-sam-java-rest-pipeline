@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrderDao.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">A sample REST application built on SAM and DynamoDB</a> &gt; <a href="index.source.html" class="el_package">com.amazonaws.dao</a> &gt; <span class="el_source">OrderDao.java</span></div><h1>OrderDao.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the &quot;Software&quot;), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so.
+ *
+ * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+package com.amazonaws.dao;
+
+import com.amazonaws.exception.CouldNotCreateOrderException;
+import com.amazonaws.exception.OrderDoesNotExistException;
+import com.amazonaws.exception.TableDoesNotExistException;
+import com.amazonaws.exception.UnableToDeleteException;
+import com.amazonaws.exception.UnableToUpdateException;
+import com.amazonaws.model.Order;
+import com.amazonaws.model.OrderPage;
+import com.amazonaws.model.request.CreateOrderRequest;
+
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException;
+import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
+import software.amazon.awssdk.services.dynamodb.model.ReturnValue;
+import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
+import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
+import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse;
+
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+public class OrderDao {
+
+    private static final String UPDATE_EXPRESSION
+            = &quot;SET customerId = :cid, preTaxAmount = :pre, postTaxAmount = :post ADD version :o&quot;;
+    private static final String ORDER_ID = &quot;orderId&quot;;
+    private static final String PRE_TAX_AMOUNT_WAS_NULL = &quot;preTaxAmount was null&quot;;
+    private static final String POST_TAX_AMOUNT_WAS_NULL = &quot;postTaxAmount was null&quot;;
+    private static final String VERSION_WAS_NULL = &quot;version was null&quot;;
+
+    private final String tableName;
+    private final DynamoDbClient dynamoDb;
+    private final int pageSize;
+
+    /**
+     * Constructs an OrderDao.
+     * @param dynamoDb dynamodb client
+     * @param tableName name of table to use for orders
+     * @param pageSize size of pages for getOrders
+     */
+    public OrderDao(final DynamoDbClient dynamoDb, final String tableName,
+<span class="fc" id="L73">                    final int pageSize) {</span>
+<span class="fc" id="L74">        this.dynamoDb = dynamoDb;</span>
+<span class="fc" id="L75">        this.tableName = tableName;</span>
+<span class="fc" id="L76">        this.pageSize = pageSize;</span>
+<span class="fc" id="L77">    }</span>
+
+    /**
+     * Returns an order or throws if the order does not exist.
+     * @param orderId id of order to get
+     * @return the order if it exists
+     * @throws OrderDoesNotExistException if the order does not exist
+     */
+    public Order getOrder(final String orderId) {
+        try {
+<span class="fc" id="L87">            return Optional.ofNullable(</span>
+<span class="fc" id="L88">                    dynamoDb.getItem(GetItemRequest.builder()</span>
+<span class="fc" id="L89">                            .tableName(tableName)</span>
+<span class="fc" id="L90">                            .key(Collections.singletonMap(ORDER_ID,</span>
+<span class="fc" id="L91">                                    AttributeValue.builder().s(orderId).build()))</span>
+<span class="fc" id="L92">                            .build()))</span>
+<span class="fc" id="L93">                    .map(GetItemResponse::item)</span>
+<span class="fc" id="L94">                    .map(this::convert)</span>
+<span class="fc" id="L95">                    .orElseThrow(() -&gt; new OrderDoesNotExistException(&quot;Order &quot;</span>
+                            + orderId + &quot; does not exist&quot;));
+<span class="fc" id="L97">        } catch (ResourceNotFoundException e) {</span>
+<span class="fc" id="L98">            throw new TableDoesNotExistException(&quot;Order table &quot; + tableName + &quot; does not exist&quot;);</span>
+        }
+    }
+
+    /**
+     * Gets a page of orders, at most pageSize long.
+     * @param exclusiveStartOrderId the exclusive start id for the next page.
+     * @return a page of orders.
+     * @throws TableDoesNotExistException if the order table does not exist
+     */
+    public OrderPage getOrders(final String exclusiveStartOrderId) {
+        final ScanResponse result;
+
+        try {
+<span class="fc" id="L112">            ScanRequest.Builder scanBuilder = ScanRequest.builder()</span>
+<span class="fc" id="L113">                    .tableName(tableName)</span>
+<span class="fc" id="L114">                    .limit(pageSize);</span>
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">            if (!isNullOrEmpty(exclusiveStartOrderId)) {</span>
+<span class="nc" id="L116">                scanBuilder.exclusiveStartKey(Collections.singletonMap(ORDER_ID,</span>
+<span class="nc" id="L117">                        AttributeValue.builder().s(exclusiveStartOrderId).build()));</span>
+            }
+<span class="fc" id="L119">            result = dynamoDb.scan(scanBuilder.build());</span>
+<span class="fc" id="L120">        } catch (ResourceNotFoundException e) {</span>
+<span class="fc" id="L121">            throw new TableDoesNotExistException(&quot;Order table &quot; + tableName</span>
+                    + &quot; does not exist&quot;);
+<span class="fc" id="L123">        }</span>
+
+<span class="fc" id="L125">        final List&lt;Order&gt; orders = result.items().stream()</span>
+<span class="fc" id="L126">                .map(this::convert)</span>
+<span class="fc" id="L127">                .collect(Collectors.toList());</span>
+
+<span class="fc" id="L129">        OrderPage.OrderPageBuilder builder = OrderPage.builder().orders(orders);</span>
+<span class="pc bpc" id="L130" title="1 of 4 branches missed.">        if (result.lastEvaluatedKey() != null &amp;&amp; !result.lastEvaluatedKey().isEmpty()) {</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">            if ((!result.lastEvaluatedKey().containsKey(ORDER_ID)</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">                    || isNullOrEmpty(result.lastEvaluatedKey().get(ORDER_ID).s()))) {</span>
+<span class="fc" id="L133">                throw new IllegalStateException(</span>
+                    &quot;orderId did not exist or was not a non-empty string in the lastEvaluatedKey&quot;);
+            } else {
+<span class="fc" id="L136">                builder.lastEvaluatedKey(result.lastEvaluatedKey().get(ORDER_ID).s());</span>
+            }
+        }
+
+<span class="fc" id="L140">        return builder.build();</span>
+    }
+
+    /**
+     * Updates an order object.
+     * @param order order to update
+     * @return updated order
+     */
+    public Order updateOrder(final Order order) {
+<span class="fc bfc" id="L149" title="All 2 branches covered.">        if (order == null) {</span>
+<span class="fc" id="L150">            throw new IllegalArgumentException(&quot;Order to update was null&quot;);</span>
+        }
+<span class="fc" id="L152">        String orderId = order.getOrderId();</span>
+<span class="fc bfc" id="L153" title="All 2 branches covered.">        if (isNullOrEmpty(orderId)) {</span>
+<span class="fc" id="L154">            throw new IllegalArgumentException(&quot;orderId was null or empty&quot;);</span>
+        }
+<span class="fc" id="L156">        Map&lt;String, AttributeValue&gt; expressionAttributeValues = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L157">        expressionAttributeValues.put(&quot;:cid&quot;,</span>
+<span class="fc" id="L158">                AttributeValue.builder().s(validateCustomerId(order.getCustomerId())).build());</span>
+
+        try {
+<span class="fc" id="L161">            expressionAttributeValues.put(&quot;:pre&quot;,</span>
+<span class="fc" id="L162">                    AttributeValue.builder().n(order.getPreTaxAmount().toString()).build());</span>
+<span class="fc" id="L163">        } catch (NullPointerException e) {</span>
+<span class="fc" id="L164">            throw new IllegalArgumentException(PRE_TAX_AMOUNT_WAS_NULL);</span>
+<span class="fc" id="L165">        }</span>
+        try {
+<span class="fc" id="L167">            expressionAttributeValues.put(&quot;:post&quot;,</span>
+<span class="fc" id="L168">                    AttributeValue.builder().n(order.getPostTaxAmount().toString()).build());</span>
+<span class="fc" id="L169">        } catch (NullPointerException e) {</span>
+<span class="fc" id="L170">            throw new IllegalArgumentException(POST_TAX_AMOUNT_WAS_NULL);</span>
+<span class="fc" id="L171">        }</span>
+<span class="fc" id="L172">        expressionAttributeValues.put(&quot;:o&quot;, AttributeValue.builder().n(&quot;1&quot;).build());</span>
+        try {
+<span class="fc" id="L174">            expressionAttributeValues.put(&quot;:v&quot;,</span>
+<span class="fc" id="L175">                    AttributeValue.builder().n(order.getVersion().toString()).build());</span>
+<span class="fc" id="L176">        } catch (NullPointerException e) {</span>
+<span class="fc" id="L177">            throw new IllegalArgumentException(VERSION_WAS_NULL);</span>
+<span class="fc" id="L178">        }</span>
+        final UpdateItemResponse result;
+        try {
+<span class="fc" id="L181">            result = dynamoDb.updateItem(UpdateItemRequest.builder()</span>
+<span class="fc" id="L182">                    .tableName(tableName)</span>
+<span class="fc" id="L183">                    .key(Collections.singletonMap(ORDER_ID,</span>
+<span class="fc" id="L184">                            AttributeValue.builder().s(order.getOrderId()).build()))</span>
+<span class="fc" id="L185">                    .returnValues(ReturnValue.ALL_NEW)</span>
+<span class="fc" id="L186">                    .updateExpression(UPDATE_EXPRESSION)</span>
+<span class="fc" id="L187">                    .conditionExpression(&quot;attribute_exists(orderId) AND version = :v&quot;)</span>
+<span class="fc" id="L188">                    .expressionAttributeValues(expressionAttributeValues)</span>
+<span class="fc" id="L189">                    .build());</span>
+<span class="fc" id="L190">        } catch (ConditionalCheckFailedException e) {</span>
+<span class="fc" id="L191">            throw new UnableToUpdateException(</span>
+                    &quot;Either the order did not exist or the provided version was not current&quot;);
+<span class="fc" id="L193">        } catch (ResourceNotFoundException e) {</span>
+<span class="fc" id="L194">            throw new TableDoesNotExistException(&quot;Order table &quot; + tableName</span>
+                    + &quot; does not exist and was deleted after reading the order&quot;);
+<span class="fc" id="L196">        }</span>
+<span class="fc" id="L197">        return convert(result.attributes());</span>
+    }
+
+    /**
+     * Deletes an order.
+     * @param orderId order id of order to delete
+     * @return the deleted order
+     */
+    public Order deleteOrder(final String orderId) {
+        final DeleteItemResponse result;
+        try {
+<span class="fc" id="L208">            return Optional.ofNullable(dynamoDb.deleteItem(DeleteItemRequest.builder()</span>
+<span class="fc" id="L209">                            .tableName(tableName)</span>
+<span class="fc" id="L210">                            .key(Collections.singletonMap(ORDER_ID,</span>
+<span class="fc" id="L211">                                    AttributeValue.builder().s(orderId).build()))</span>
+<span class="fc" id="L212">                            .conditionExpression(&quot;attribute_exists(orderId)&quot;)</span>
+<span class="fc" id="L213">                            .returnValues(ReturnValue.ALL_OLD)</span>
+<span class="fc" id="L214">                            .build()))</span>
+<span class="fc" id="L215">                    .map(DeleteItemResponse::attributes)</span>
+<span class="fc" id="L216">                    .map(this::convert)</span>
+<span class="fc" id="L217">                    .orElseThrow(() -&gt; new IllegalStateException(</span>
+                            &quot;Condition passed but deleted item was null&quot;));
+<span class="fc" id="L219">        } catch (ConditionalCheckFailedException e) {</span>
+<span class="fc" id="L220">            throw new UnableToDeleteException(</span>
+                    &quot;A competing request changed the order while processing this request&quot;);
+<span class="fc" id="L222">        } catch (ResourceNotFoundException e) {</span>
+<span class="fc" id="L223">            throw new TableDoesNotExistException(&quot;Order table &quot; + tableName</span>
+                    + &quot; does not exist and was deleted after reading the order&quot;);
+        }
+    }
+
+    private Order convert(final Map&lt;String, AttributeValue&gt; item) {
+<span class="pc bpc" id="L229" title="1 of 4 branches missed.">        if (item == null || item.isEmpty()) {</span>
+<span class="fc" id="L230">            return null;</span>
+        }
+<span class="fc" id="L232">        Order.OrderBuilder builder = Order.builder();</span>
+
+        try {
+<span class="fc" id="L235">            builder.orderId(item.get(ORDER_ID).s());</span>
+<span class="nc" id="L236">        } catch (NullPointerException e) {</span>
+<span class="nc" id="L237">            throw new IllegalStateException(</span>
+                    &quot;item did not have an orderId attribute or it was not a String&quot;);
+<span class="fc" id="L239">        }</span>
+
+        try {
+<span class="fc" id="L242">            builder.customerId(item.get(&quot;customerId&quot;).s());</span>
+<span class="fc" id="L243">        } catch (NullPointerException e) {</span>
+<span class="fc" id="L244">            throw new IllegalStateException(</span>
+                    &quot;item did not have an customerId attribute or it was not a String&quot;);
+<span class="fc" id="L246">        }</span>
+
+        try {
+<span class="fc" id="L249">            builder.preTaxAmount(new BigDecimal(item.get(&quot;preTaxAmount&quot;).n()));</span>
+<span class="fc" id="L250">        } catch (NullPointerException | NumberFormatException e) {</span>
+<span class="fc" id="L251">            throw new IllegalStateException(</span>
+                    &quot;item did not have an preTaxAmount attribute or it was not a Number&quot;);
+<span class="fc" id="L253">        }</span>
+
+        try {
+<span class="fc" id="L256">            builder.postTaxAmount(new BigDecimal(item.get(&quot;postTaxAmount&quot;).n()));</span>
+<span class="fc" id="L257">        } catch (NullPointerException | NumberFormatException e) {</span>
+<span class="fc" id="L258">            throw new IllegalStateException(</span>
+                    &quot;item did not have an postTaxAmount attribute or it was not a Number&quot;);
+<span class="fc" id="L260">        }</span>
+
+        try {
+<span class="fc" id="L263">            builder.version(Long.valueOf(item.get(&quot;version&quot;).n()));</span>
+<span class="fc" id="L264">        } catch (NullPointerException | NumberFormatException e) {</span>
+<span class="fc" id="L265">            throw new IllegalStateException(</span>
+                    &quot;item did not have an version attribute or it was not a Number&quot;);
+<span class="fc" id="L267">        }</span>
+
+<span class="fc" id="L269">        return builder.build();</span>
+    }
+
+    private Map&lt;String, AttributeValue&gt; createOrderItem(final CreateOrderRequest order) {
+<span class="fc" id="L273">        Map&lt;String, AttributeValue&gt; item = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L274">        item.put(ORDER_ID, AttributeValue.builder().s(UUID.randomUUID().toString()).build());</span>
+<span class="fc" id="L275">        item.put(&quot;version&quot;, AttributeValue.builder().n(&quot;1&quot;).build());</span>
+<span class="fc" id="L276">        item.put(&quot;customerId&quot;,</span>
+<span class="fc" id="L277">                AttributeValue.builder().s(validateCustomerId(order.getCustomerId())).build());</span>
+        try {
+<span class="fc" id="L279">            item.put(&quot;preTaxAmount&quot;,</span>
+<span class="fc" id="L280">                    AttributeValue.builder().n(order.getPreTaxAmount().toString()).build());</span>
+<span class="nc" id="L281">        } catch (NullPointerException e) {</span>
+<span class="nc" id="L282">            throw new IllegalArgumentException(PRE_TAX_AMOUNT_WAS_NULL);</span>
+<span class="fc" id="L283">        }</span>
+        try {
+<span class="fc" id="L285">            item.put(&quot;postTaxAmount&quot;,</span>
+<span class="fc" id="L286">                    AttributeValue.builder().n(order.getPostTaxAmount().toString()).build());</span>
+<span class="nc" id="L287">        } catch (NullPointerException e) {</span>
+<span class="nc" id="L288">            throw new IllegalArgumentException(POST_TAX_AMOUNT_WAS_NULL);</span>
+<span class="fc" id="L289">        }</span>
+
+<span class="fc" id="L291">        return item;</span>
+    }
+
+    private String validateCustomerId(final String customerId) {
+<span class="fc bfc" id="L295" title="All 2 branches covered.">        if (isNullOrEmpty(customerId)) {</span>
+<span class="fc" id="L296">            throw new IllegalArgumentException(&quot;customerId was null or empty&quot;);</span>
+        }
+<span class="fc" id="L298">        return customerId;</span>
+    }
+
+    /**
+     * Creates an order.
+     * @param createOrderRequest details of order to create
+     * @return created order
+     */
+    public Order createOrder(final CreateOrderRequest createOrderRequest) {
+<span class="fc bfc" id="L307" title="All 2 branches covered.">        if (createOrderRequest == null) {</span>
+<span class="fc" id="L308">            throw new IllegalArgumentException(&quot;CreateOrderRequest was null&quot;);</span>
+        }
+<span class="fc" id="L310">        int tries = 0;</span>
+<span class="fc bfc" id="L311" title="All 2 branches covered.">        while (tries &lt; 10) {</span>
+            try {
+<span class="fc" id="L313">                Map&lt;String, AttributeValue&gt; item = createOrderItem(createOrderRequest);</span>
+<span class="fc" id="L314">                dynamoDb.putItem(PutItemRequest.builder()</span>
+<span class="fc" id="L315">                        .tableName(tableName)</span>
+<span class="fc" id="L316">                        .item(item)</span>
+<span class="fc" id="L317">                        .conditionExpression(&quot;attribute_not_exists(orderId)&quot;)</span>
+<span class="fc" id="L318">                        .build());</span>
+<span class="fc" id="L319">                return Order.builder()</span>
+<span class="fc" id="L320">                        .orderId(item.get(ORDER_ID).s())</span>
+<span class="fc" id="L321">                        .customerId(item.get(&quot;customerId&quot;).s())</span>
+<span class="fc" id="L322">                        .preTaxAmount(new BigDecimal(item.get(&quot;preTaxAmount&quot;).n()))</span>
+<span class="fc" id="L323">                        .postTaxAmount(new BigDecimal(item.get(&quot;postTaxAmount&quot;).n()))</span>
+<span class="fc" id="L324">                        .version(Long.valueOf(item.get(&quot;version&quot;).n()))</span>
+<span class="fc" id="L325">                        .build();</span>
+<span class="fc" id="L326">            } catch (ConditionalCheckFailedException e) {</span>
+<span class="fc" id="L327">                tries++;</span>
+<span class="fc" id="L328">            } catch (ResourceNotFoundException e) {</span>
+<span class="fc" id="L329">                throw new TableDoesNotExistException(</span>
+                        &quot;Order table &quot; + tableName + &quot; does not exist&quot;);
+<span class="fc" id="L331">            }</span>
+        }
+<span class="fc" id="L333">        throw new CouldNotCreateOrderException(</span>
+                &quot;Unable to generate unique order id after 10 tries&quot;);
+    }
+
+    private static boolean isNullOrEmpty(final String string) {
+<span class="fc bfc" id="L338" title="All 4 branches covered.">        return string == null || string.isEmpty();</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

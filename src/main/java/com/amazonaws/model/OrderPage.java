@@ -25,6 +25,6 @@ import java.util.List;
 @Builder
 @Getter
 public class OrderPage {
-    private final List<Order> orders;
-    private final String lastEvaluatedKey;
+    private List<Order> orders;
+    private String lastEvaluatedKey;
 }

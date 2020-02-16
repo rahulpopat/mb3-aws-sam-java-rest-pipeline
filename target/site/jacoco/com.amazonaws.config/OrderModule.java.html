@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrderModule.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">A sample REST application built on SAM and DynamoDB</a> &gt; <a href="index.source.html" class="el_package">com.amazonaws.config</a> &gt; <span class="el_source">OrderModule.java</span></div><h1>OrderModule.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the &quot;Software&quot;), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so.
+ *
+ * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+package com.amazonaws.config;
+
+import com.amazonaws.dao.OrderDao;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import dagger.Module;
+import dagger.Provides;
+import software.amazon.awssdk.http.apache.ApacheHttpClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClientBuilder;
+
+import java.net.URI;
+import java.util.Optional;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+@Module
+<span class="fc" id="L35">public class OrderModule {</span>
+    @Singleton
+    @Provides
+    @Named(&quot;tableName&quot;)
+    String tableName() {
+<span class="fc" id="L40">        return Optional.ofNullable(System.getenv(&quot;TABLE_NAME&quot;)).orElse(&quot;orders_table&quot;);</span>
+    }
+
+    @Singleton
+    @Provides
+    DynamoDbClient dynamoDb() {
+<span class="fc" id="L46">        final String endpoint = System.getenv(&quot;ENDPOINT_OVERRIDE&quot;);</span>
+
+<span class="fc" id="L48">        DynamoDbClientBuilder builder = DynamoDbClient.builder();</span>
+<span class="fc" id="L49">        builder.httpClient(ApacheHttpClient.builder().build());</span>
+<span class="pc bpc" id="L50" title="1 of 4 branches missed.">        if (endpoint != null &amp;&amp; !endpoint.isEmpty()) {</span>
+<span class="fc" id="L51">            builder.endpointOverride(URI.create(endpoint));</span>
+        }
+
+<span class="fc" id="L54">        return builder.build();</span>
+    }
+
+    @Singleton
+    @Provides
+    ObjectMapper objectMapper() {
+<span class="fc" id="L60">        return new ObjectMapper();</span>
+    }
+
+    @Singleton
+    @Provides
+    public OrderDao orderDao(DynamoDbClient dynamoDb, @Named(&quot;tableName&quot;) String tableName) {
+<span class="fc" id="L66">        return new OrderDao(dynamoDb, tableName,10);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
