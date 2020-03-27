@@ -1,9 +1,9 @@
 https://github.com/aws-samples/aws-sam-java-rest
 
-# SAM DynamoDB Application for Managing Orders
+# SAM DynamoDB Application for Managing Bookings
 
 This is a sample application to demonstrate how to build an application on DynamoDB using the
-DynamoDBMapper ORM framework to map Order items in a DynamoDB table to a RESTful API for booking
+DynamoDBMapper ORM framework to map Booking items in a DynamoDB table to a RESTful API for booking
 management.
 
 ```bash
@@ -16,39 +16,39 @@ management.
 │   ├── main
 │   │   └── java
 │   │       ├── com.amazonaws.config              <-- Classes to manage Dagger 2 dependency injection
-│   │       │   ├── OrderComponent.java           <-- Contains inject methods for handler entrypoints
-│   │       │   └── OrderModule.java              <-- Provides dependencies like the DynamoDB client for injection
+│   │       │   ├── BookingComponent.java           <-- Contains inject methods for handler entrypoints
+│   │       │   └── BookingModule.java              <-- Provides dependencies like the DynamoDB client for injection
 │   │       ├── com.amazonaws.dao                 <-- Package for DAO objects
-│   │       │   └── OrderDao.java                 <-- DAO Wrapper around the DynamoDBTableMapper for Orders
+│   │       │   └── BookingDao.java                 <-- DAO Wrapper around the DynamoDBTableMapper for Bookings
 │   │       ├── com.amazonaws.exception           <-- Source code for custom exceptions
 │   │       ├── com.amazonaws.handler             <-- Source code for lambda functions
-│   │       │   ├── CreateOrderHandler.java       <-- Lambda function code for creating bookings
-│   │       │   ├── CreateOrdersTableHandler.java <-- Lambda function code for creating the bookings table
-│   │       │   ├── DeleteOrderHandler.java       <-- Lambda function code for deleting bookings
-│   │       │   ├── GetOrderHandler.java          <-- Lambda function code for getting one booking
-│   │       │   ├── GetOrdersHandler.java         <-- Lambda function code for getting a page of bookings
-│   │       │   └── UpdateOrderHandler.java       <-- Lambda function code for updating an booking
+│   │       │   ├── CreateBookingHandler.java       <-- Lambda function code for creating bookings
+│   │       │   ├── CreateBookingsTableHandler.java <-- Lambda function code for creating the bookings table
+│   │       │   ├── DeleteBookingHandler.java       <-- Lambda function code for deleting bookings
+│   │       │   ├── GetBookingHandler.java          <-- Lambda function code for getting one booking
+│   │       │   ├── GetBookingsHandler.java         <-- Lambda function code for getting a page of bookings
+│   │       │   └── UpdateBookingHandler.java       <-- Lambda function code for updating an booking
 │   │       └── com.amazonaws.model               <-- Source code for model classes
 │   │           ├── request                       <-- Source code for request model classes
-│   │           │   ├── CreateOrderRequest.java      <-- POJO shape for creating an booking
-│   │           │   ├── GetOrDeleteOrderRequest.java <-- POJO shape for getting or deleting an booking
-│   │           │   ├── GetOrdersRequest.java        <-- POJO shape for getting a page of bookings
-│   │           │   └── UpdateOrderRequest.java      <-- POJO shape for updating an booking
+│   │           │   ├── CreateBookingRequest.java      <-- POJO shape for creating an booking
+│   │           │   ├── GetOrDeleteBookingRequest.java <-- POJO shape for getting or deleting an booking
+│   │           │   ├── GetBookingsRequest.java        <-- POJO shape for getting a page of bookings
+│   │           │   └── UpdateBookingRequest.java      <-- POJO shape for updating an booking
 │   │           ├── response                      <-- Source code for response model classes
 │   │           │   ├── GatewayResponse.java         <-- Generic POJO shape for the APIGateway integration
-│   │           │   └── GetOrdersResponse.java       <-- POJO shape for a page of bookings
-│   │           └── Order.java                    <-- POJO for Order resources
+│   │           │   └── GetBookingsResponse.java       <-- POJO shape for a page of bookings
+│   │           └── Booking.java                    <-- POJO for Booking resources
 │   └── test                                      <-- Unit and integration tests
 │       └── java
 │           ├── com.amazonaws.config              <-- Classes to manage Dagger 2 dependency injection
-│           ├── com.amazonaws.dao                 <-- Tests for OrderDao
+│           ├── com.amazonaws.dao                 <-- Tests for BookingDao
 │           ├── com.amazonaws.handler             <-- Unit and integration tests for handlers
-│           │   ├── CreateOrderHandlerIT.java     <-- Integration tests for creating bookings
-│           │   ├── CreateOrderHandlerTest.java   <-- Unit tests for creating bookings
-│           │   ├── DeleteOrderHandlerTest.java   <-- Unit tests for deleting bookings
-│           │   ├── GetOrderHandlerTest.java      <-- Unit tests for getting one booking
-│           │   ├── GetOrdersHandlerTest.java     <-- Unit tests for getting a page of bookings
-│           │   └── UpdateOrderHandlerTest.java   <-- Unit tests for updating an booking
+│           │   ├── CreateBookingHandlerIT.java     <-- Integration tests for creating bookings
+│           │   ├── CreateBookingHandlerTest.java   <-- Unit tests for creating bookings
+│           │   ├── DeleteBookingHandlerTest.java   <-- Unit tests for deleting bookings
+│           │   ├── GetBookingHandlerTest.java      <-- Unit tests for getting one booking
+│           │   ├── GetBookingsHandlerTest.java     <-- Unit tests for getting a page of bookings
+│           │   └── UpdateBookingHandlerTest.java   <-- Unit tests for updating an booking
 │           └── com.amazonaws.services.lambda.runtime <-- Unit and integration tests for handlers
 │               └── TestContext.java              <-- Context implementation for use in tests
 └── template.yaml                                 <-- Contains SAM API Gateway + Lambda definitions
@@ -77,7 +77,7 @@ mvn package
 
 **Invoking function locally through local API Gateway**
 1. Start DynamoDB Local in a Docker container. `docker run -p 8000:8000 amazon/dynamodb-local`
-2. Create the DynamoDB table. `aws dynamodb create-table --table-name orders_table --attribute-definitions AttributeName=orderId,AttributeType=S --key-schema AttributeName=orderId,KeyType=HASH --billing-mode PAY_PER_REQUEST --endpoint-url http://localhost:8000`
+2. Create the DynamoDB table. `aws dynamodb create-table --table-name bookings_table --attribute-definitions AttributeName=bookingId,AttributeType=S --key-schema AttributeName=bookingId,KeyType=HASH --billing-mode PAY_PER_REQUEST --endpoint-url http://localhost:8000`
 3. Start the SAM local API.
  - On a Mac: `sam local start-api --env-vars src/test/resources/test_environment_mac.json`
  - On Windows: `sam local start-api --env-vars src/test/resources/test_environment_windows.json`
@@ -93,7 +93,7 @@ following excerpt is what the CLI will read in booking to initialize an API and 
 ```yaml
 ...
 Events:
-    GetOrders:
+    GetBookings:
         Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
         Properties:
             Path: /bookings
@@ -108,7 +108,7 @@ dependencies:
 
 ```yaml
 ...
-    GetOrdersFunction:
+    GetBookingsFunction:
         Type: AWS::Serverless::Function
         Properties:
             CodeUri: target/aws-sam-java-rest-1.0.0.jar
@@ -138,7 +138,7 @@ Next, the following command will create a Cloudformation Stack and deploy your S
 ```bash
 sam deploy \
     --template-file packaged.yaml \
-    --stack-name sam-orderHandler \
+    --stack-name sam-bookingHandler \
     --capabilities CAPABILITY_IAM
 ```
 
@@ -148,7 +148,7 @@ After deployment is complete you can run the following command to retrieve the A
 
 ```bash
 aws cloudformation describe-stacks \
-    --stack-name sam-orderHandler \
+    --stack-name sam-bookingHandler \
     --query 'Stacks[].Outputs'
 ```
 
@@ -156,7 +156,7 @@ aws cloudformation describe-stacks \
 
 ### Running unit tests
 We use `JUnit` for testing our code.
-Unit tests in this sample package mock out the DynamoDBTableMapper class for Order objects.
+Unit tests in this sample package mock out the DynamoDBTableMapper class for Booking objects.
 Unit tests do not require connectivity to a DynamoDB endpoint. You can run unit tests with the
 following command:
 
@@ -198,12 +198,12 @@ sam package \
 
 sam deploy \
     --template-file packaged.yaml \
-    --stack-name sam-orderHandler \
+    --stack-name sam-bookingHandler \
     --capabilities CAPABILITY_IAM \
     --parameter-overrides MyParameterSample=MySampleValue
 
 aws cloudformation describe-stacks \
-    --stack-name sam-orderHandler --query 'Stacks[].Outputs'
+    --stack-name sam-bookingHandler --query 'Stacks[].Outputs'
 ```
 
 ## Bringing to the next level
