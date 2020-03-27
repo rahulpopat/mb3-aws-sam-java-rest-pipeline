@@ -1,6 +1,6 @@
 https://github.com/aws-samples/aws-sam-java-rest
 
-# SAM DynamoDB Application for Managing Bookings
+# SAM DynamoDB Application for Managing Bookings - extra space to trigger build
 
 This is a sample application to demonstrate how to build an application on DynamoDB using the
 DynamoDBMapper ORM framework to map Booking items in a DynamoDB table to a RESTful API for booking
