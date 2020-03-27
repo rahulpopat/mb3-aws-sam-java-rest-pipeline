@@ -2,35 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.amazonaws</groupId>
-  <artifactId>aws-sam-java-rest</artifactId>
+  <artifactId>mb3-aws-sam-java-rest</artifactId>
   <name>A sample REST application built on SAM and DynamoDB</name>
   <version>1.0.0</version>
   <inceptionYear>2018</inceptionYear>
   <developers>
     <developer>
-      <name>Alexander Patrikalakis</name>
-      <email>amcpatrikalakis@gmail.com</email>
-      <url>https://www.linkedin.com/in/amcpatrix/</url>
-    </developer>
-    <developer>
-      <name>Anubha Mandal</name>
-      <email>anubhamandal@gmail.com</email>
-      <url>https://www.linkedin.com/in/anubhamandal/</url>
-    </developer>
-    <developer>
-      <name>Shashank Saxena</name>
-      <email>saxena.shashank96@gmail.com</email>
-      <url>https://www.linkedin.com/in/shank96/</url>
-    </developer>
-    <developer>
-      <name>Jacob Fuss</name>
-      <email>jfuss@amazon.com</email>
-      <url>https://www.linkedin.com/in/jacob-fuss-11878731/</url>
-    </developer>
-    <developer>
-      <name>Mario Freitas</name>
-      <email>supmario@amazon.co.jp</email>
-      <url>https://www.linkedin.com/in/mariofreitas/</url>
+      <name>Rahul Popat</name>
+      <email>poprahul@amazon.com</email>
     </developer>
   </developers>
   <licenses>
@@ -81,23 +60,6 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
-        <version>${findbugs.maven.plugin.version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <effort>Max</effort>
-          <threshold>Low</threshold>
-          <xmlOutput>true</xmlOutput>
-        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-checkstyle-plugin</artifactId>
@@ -348,7 +310,6 @@
   </dependencyManagement>
   <properties>
     <lombok.version>1.18.2</lombok.version>
-    <findbugs.maven.plugin.version>3.0.5</findbugs.maven.plugin.version>
     <maven.enforcer.plugin.version>3.0.0-M2</maven.enforcer.plugin.version>
     <junit.version>4.12</junit.version>
     <dynamodblocal.version>1.11.119</dynamodblocal.version>

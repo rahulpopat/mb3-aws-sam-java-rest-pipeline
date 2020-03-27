@@ -1,7 +1,9 @@
+https://github.com/aws-samples/aws-sam-java-rest
+
 # SAM DynamoDB Application for Managing Orders
 
 This is a sample application to demonstrate how to build an application on DynamoDB using the
-DynamoDBMapper ORM framework to map Order items in a DynamoDB table to a RESTful API for order
+DynamoDBMapper ORM framework to map Order items in a DynamoDB table to a RESTful API for booking
 management.
 
 ```bash
@@ -20,33 +22,33 @@ management.
 │   │       │   └── OrderDao.java                 <-- DAO Wrapper around the DynamoDBTableMapper for Orders
 │   │       ├── com.amazonaws.exception           <-- Source code for custom exceptions
 │   │       ├── com.amazonaws.handler             <-- Source code for lambda functions
-│   │       │   ├── CreateOrderHandler.java       <-- Lambda function code for creating orders
-│   │       │   ├── CreateOrdersTableHandler.java <-- Lambda function code for creating the orders table
-│   │       │   ├── DeleteOrderHandler.java       <-- Lambda function code for deleting orders
-│   │       │   ├── GetOrderHandler.java          <-- Lambda function code for getting one order
-│   │       │   ├── GetOrdersHandler.java         <-- Lambda function code for getting a page of orders
-│   │       │   └── UpdateOrderHandler.java       <-- Lambda function code for updating an order
+│   │       │   ├── CreateOrderHandler.java       <-- Lambda function code for creating bookings
+│   │       │   ├── CreateOrdersTableHandler.java <-- Lambda function code for creating the bookings table
+│   │       │   ├── DeleteOrderHandler.java       <-- Lambda function code for deleting bookings
+│   │       │   ├── GetOrderHandler.java          <-- Lambda function code for getting one booking
+│   │       │   ├── GetOrdersHandler.java         <-- Lambda function code for getting a page of bookings
+│   │       │   └── UpdateOrderHandler.java       <-- Lambda function code for updating an booking
 │   │       └── com.amazonaws.model               <-- Source code for model classes
 │   │           ├── request                       <-- Source code for request model classes
-│   │           │   ├── CreateOrderRequest.java      <-- POJO shape for creating an order
-│   │           │   ├── GetOrDeleteOrderRequest.java <-- POJO shape for getting or deleting an order
-│   │           │   ├── GetOrdersRequest.java        <-- POJO shape for getting a page of orders
-│   │           │   └── UpdateOrderRequest.java      <-- POJO shape for updating an order
+│   │           │   ├── CreateOrderRequest.java      <-- POJO shape for creating an booking
+│   │           │   ├── GetOrDeleteOrderRequest.java <-- POJO shape for getting or deleting an booking
+│   │           │   ├── GetOrdersRequest.java        <-- POJO shape for getting a page of bookings
+│   │           │   └── UpdateOrderRequest.java      <-- POJO shape for updating an booking
 │   │           ├── response                      <-- Source code for response model classes
 │   │           │   ├── GatewayResponse.java         <-- Generic POJO shape for the APIGateway integration
-│   │           │   └── GetOrdersResponse.java       <-- POJO shape for a page of orders
+│   │           │   └── GetOrdersResponse.java       <-- POJO shape for a page of bookings
 │   │           └── Order.java                    <-- POJO for Order resources
 │   └── test                                      <-- Unit and integration tests
 │       └── java
 │           ├── com.amazonaws.config              <-- Classes to manage Dagger 2 dependency injection
 │           ├── com.amazonaws.dao                 <-- Tests for OrderDao
 │           ├── com.amazonaws.handler             <-- Unit and integration tests for handlers
-│           │   ├── CreateOrderHandlerIT.java     <-- Integration tests for creating orders
-│           │   ├── CreateOrderHandlerTest.java   <-- Unit tests for creating orders
-│           │   ├── DeleteOrderHandlerTest.java   <-- Unit tests for deleting orders
-│           │   ├── GetOrderHandlerTest.java      <-- Unit tests for getting one order
-│           │   ├── GetOrdersHandlerTest.java     <-- Unit tests for getting a page of orders
-│           │   └── UpdateOrderHandlerTest.java   <-- Unit tests for updating an order
+│           │   ├── CreateOrderHandlerIT.java     <-- Integration tests for creating bookings
+│           │   ├── CreateOrderHandlerTest.java   <-- Unit tests for creating bookings
+│           │   ├── DeleteOrderHandlerTest.java   <-- Unit tests for deleting bookings
+│           │   ├── GetOrderHandlerTest.java      <-- Unit tests for getting one booking
+│           │   ├── GetOrdersHandlerTest.java     <-- Unit tests for getting a page of bookings
+│           │   └── UpdateOrderHandlerTest.java   <-- Unit tests for updating an booking
 │           └── com.amazonaws.services.lambda.runtime <-- Unit and integration tests for handlers
 │               └── TestContext.java              <-- Context implementation for use in tests
 └── template.yaml                                 <-- Contains SAM API Gateway + Lambda definitions
@@ -82,11 +84,11 @@ mvn package
  - On Linux: `sam local start-api --env-vars src/test/resources/test_environment_linux.json`
 
 If the previous command ran successfully you should now be able to hit the following local endpoint to
-invoke the functions rooted at `http://localhost:3000/orders`
+invoke the functions rooted at `http://localhost:3000/bookings`
 
 **SAM CLI** is used to emulate both Lambda and API Gateway locally and uses our `template.yaml` to
 understand how to bootstrap this environment (runtime, where the source code is, etc.) - The
-following excerpt is what the CLI will read in order to initialize an API and its routes:
+following excerpt is what the CLI will read in booking to initialize an API and its routes:
 
 ```yaml
 ...
@@ -94,7 +96,7 @@ Events:
     GetOrders:
         Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
         Properties:
-            Path: /orders
+            Path: /bookings
             Method: get
 ```
 
@@ -110,7 +112,7 @@ dependencies:
         Type: AWS::Serverless::Function
         Properties:
             CodeUri: target/aws-sam-java-rest-1.0.0.jar
-            Handler: com.amazonaws.handler.GetOrdersHandler::handleRequest
+            Handler: com.amazonaws.handler.GetBookingsHandler::handleRequest
 ```
 
 Firstly, we need a `S3 bucket` where we can upload our Lambda functions packaged as ZIP before we
@@ -179,7 +181,7 @@ pip3 install requests
 python3 src/test/resources/api_tests.py 3
 ```
 
-The number that follows the test script name is the number of orders to create in the
+The number that follows the test script name is the number of bookings to create in the
 test. For these tests to work, you must follow the steps for [local development](#local-development).  
 
 # Appendix

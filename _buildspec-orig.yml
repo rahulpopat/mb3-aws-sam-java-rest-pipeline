@@ -1,0 +1,37 @@
+# ~/environment/sam-app/buildspec.yml
+
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      java: openjdk8
+    commands:
+      # Upgrade AWS CLI to the latest version
+      - pip install --upgrade awscli
+
+  pre_build:
+    commands:
+      # Run tests, lint scripts or any other pre-build checks.
+      - echo Test started on `date`
+      - mvn clean compile test
+
+  build:
+    commands:
+      # Use Build phase to build your artifacts (compile, etc.)
+      - echo Build started on `date`
+      - mvn package shade:shade
+      - mv target/mb3-aws-sam-java-rest-1.0.0.jar .
+      - unzip mb3-aws-sam-java-rest-1.0.0.jar
+      - rm -rf target tst src buildspec.yml pom.xml mb3-aws-sam-java-rest-1.0.0.jar
+      - aws cloudformation package --template template.yml --s3-bucket $S3_BUCKET --output-template packaged.yaml
+
+  post_build:
+    commands:
+      # Use Post-Build for notifications, git tags, upload artifacts to S3
+      - sam package --s3-bucket $PACKAGE_BUCKET --output-template-file packaged.yaml
+
+artifacts:
+  discard-paths: yes
+  files:
+    # List of local artifacts that will be passed down the pipeline
+    - packaged.yaml

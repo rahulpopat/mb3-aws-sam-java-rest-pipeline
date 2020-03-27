@@ -12,119 +12,120 @@ Globals:
         MemorySize: 512
         Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
           Variables:
-            TABLE_NAME: !Ref OrdersTable
+            TABLE_NAME: "BookingTable"
+#            TABLE_NAME: !Ref BookingsTable
             ENDPOINT_OVERRIDE: ""
 
 Resources:
-  GetOrderFunction:
+  GetBookingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: target/aws-sam-java-rest-1.0.0.jar
-      Handler: com.amazonaws.handler.GetOrderHandler::handleRequest
+      CodeUri: ./
+#      CodeUri: target/mb3-aws-sam-java-rest-1.0.0.jar
+      Handler: com.amazonaws.handler.GetBookingHandler::handleRequest
       Runtime: java8
       Policies:
-        - DynamoDBReadPolicy:
-            TableName: !Ref OrdersTable
+        - AmazonDynamoDBFullAccess
       Events:
-        GetOrder:
+        GetBooking:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /orders/{order_id}
+            Path: /bookings/{booking_id}
             Method: get
-  GetOrdersFunction:
+  GetBookingsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: target/aws-sam-java-rest-1.0.0.jar
-      Handler: com.amazonaws.handler.GetOrdersHandler::handleRequest
+      CodeUri: ./
+#      CodeUri: target/mb3-aws-sam-java-rest-1.0.0.jar
+      Handler: com.amazonaws.handler.GetBookingsHandler::handleRequest
       Runtime: java8
       Policies:
-        - DynamoDBReadPolicy:
-            TableName: !Ref OrdersTable
+        - AmazonDynamoDBFullAccess
       Events:
-        GetOrders:
+        GetBookings:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /orders
+            Path: /bookings
             Method: get
-  UpdateOrderFunction:
+  UpdateBookingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: target/aws-sam-java-rest-1.0.0.jar
-      Handler: com.amazonaws.handler.UpdateOrderHandler::handleRequest
+      CodeUri: ./
+#      CodeUri: target/mb3-aws-sam-java-rest-1.0.0.jar
+      Handler: com.amazonaws.handler.UpdateBookingHandler::handleRequest
       Runtime: java8
       Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref OrdersTable
+        - AmazonDynamoDBFullAccess
       Events:
-        UpdateOrder:
+        UpdateBooking:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /orders/{order_id}
+            Path: /bookings/{booking_id}
             Method: post
-  DeleteOrderFunction:
+  DeleteBookingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: target/aws-sam-java-rest-1.0.0.jar
-      Handler: com.amazonaws.handler.DeleteOrderHandler::handleRequest
+      CodeUri: ./
+#      CodeUri: target/mb3-aws-sam-java-rest-1.0.0.jar
+      Handler: com.amazonaws.handler.DeleteBookingHandler::handleRequest
       Runtime: java8
       Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref OrdersTable
+        - AmazonDynamoDBFullAccess
       Events:
-        DeleteOrder:
+        DeleteBooking:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /orders/{order_id}
+            Path: /bookings/{booking_id}
             Method: delete
-  CreateOrderFunction:
+  CreateBookingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: target/aws-sam-java-rest-1.0.0.jar
-      Handler: com.amazonaws.handler.CreateOrderHandler::handleRequest
+      CodeUri: ./
+#      CodeUri: target/mb3-aws-sam-java-rest-1.0.0.jar
+      Handler: com.amazonaws.handler.CreateBookingHandler::handleRequest
       Runtime: java8
       Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref OrdersTable
+        - AmazonDynamoDBFullAccess
       Events:
-        CreateOrder:
+        CreateBooking:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /orders
+            Path: /bookings
             Method: post
 
-  OrdersTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: orders_table
-      AttributeDefinitions:
-        - AttributeName: orderId
-          AttributeType: S
-      KeySchema:
-        - AttributeName: orderId
-          KeyType: HASH
-      BillingMode: PAY_PER_REQUEST
+#  BookingsTable:
+#    Type: AWS::DynamoDB::Table
+#    Properties:
+#      TableName: bookings_table
+#      AttributeDefinitions:
+#        - AttributeName: bookingId
+#          AttributeType: S
+#      KeySchema:
+#        - AttributeName: bookingId
+#          KeyType: HASH
+#      BillingMode: PAY_PER_REQUEST
 
 Outputs:
     HelloWorldApi:
       Description: "API Gateway endpoint URL for Prod stage for Hello World function"
       Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
 
-    GetOrderFunction:
-      Description: "GetOrder Lambda Function ARN"
-      Value: !GetAtt GetOrderFunction.Arn
+    GetBookingFunction:
+      Description: "GetBooking Lambda Function ARN"
+      Value: !GetAtt GetBookingFunction.Arn
 
-    GetOrdersFunction:
-      Description: "GetOrders Lambda Function ARN"
-      Value: !GetAtt GetOrdersFunction.Arn
+    GetBookingsFunction:
+      Description: "GetBookings Lambda Function ARN"
+      Value: !GetAtt GetBookingsFunction.Arn
 
-    UpdateOrderFunction:
-      Description: "UpdateOrder Lambda Function ARN"
-      Value: !GetAtt UpdateOrderFunction.Arn
+    UpdateBookingFunction:
+      Description: "UpdateBooking Lambda Function ARN"
+      Value: !GetAtt UpdateBookingFunction.Arn
 
-    DeleteOrderFunction:
-      Description: "DeleteOrder Lambda Function ARN"
-      Value: !GetAtt DeleteOrderFunction.Arn
+    DeleteBookingFunction:
+      Description: "DeleteBooking Lambda Function ARN"
+      Value: !GetAtt DeleteBookingFunction.Arn
 
-    CreateOrderFunction:
-      Description: "CreateOrder Lambda Function ARN"
-      Value: !GetAtt CreateOrderFunction.Arn
+    CreateBookingFunction:
+      Description: "CreateBooking Lambda Function ARN"
+      Value: !GetAtt CreateBookingFunction.Arn

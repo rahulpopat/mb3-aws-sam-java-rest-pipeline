@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.amazonaws</groupId>
-    <artifactId>aws-sam-java-rest</artifactId>
+    <artifactId>mb3-aws-sam-java-rest</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>A sample REST application built on SAM and DynamoDB</name>
@@ -14,29 +14,8 @@
 
     <developers>
         <developer>
-            <name>Alexander Patrikalakis</name>
-            <email>amcpatrikalakis@gmail.com</email>
-            <url>https://www.linkedin.com/in/amcpatrix/</url>
-        </developer>
-        <developer>
-            <name>Anubha Mandal</name>
-            <email>anubhamandal@gmail.com</email>
-            <url>https://www.linkedin.com/in/anubhamandal/</url>
-        </developer>
-        <developer>
-            <name>Shashank Saxena</name>
-            <email>saxena.shashank96@gmail.com</email>
-            <url>https://www.linkedin.com/in/shank96/</url>
-        </developer>
-        <developer>
-            <name>Jacob Fuss</name>
-            <email>jfuss@amazon.com</email>
-            <url>https://www.linkedin.com/in/jacob-fuss-11878731/</url>
-        </developer>
-        <developer>
-            <name>Mario Freitas</name>
-            <email>supmario@amazon.co.jp</email>
-            <url>https://www.linkedin.com/in/mariofreitas/</url>
+            <name>Rahul Popat</name>
+            <email>poprahul@amazon.com</email>
         </developer>
     </developers>
     <inceptionYear>2018</inceptionYear>
@@ -60,13 +39,18 @@
         <mockito.version>2.0.2-beta</mockito.version>
         <maven.shade.plugin.version>3.1.1</maven.shade.plugin.version>
         <failsafe.plugin.version>2.22.0</failsafe.plugin.version>
-        <findbugs.maven.plugin.version>3.0.5</findbugs.maven.plugin.version>
+<!--        <findbugs.maven.plugin.version>3.0.5</findbugs.maven.plugin.version>-->
         <maven.enforcer.plugin.version>3.0.0-M2</maven.enforcer.plugin.version>
         <jacoco.maven.plugin.version>0.8.1</jacoco.maven.plugin.version>
         <docker.maven.plugin.version>0.26.1</docker.maven.plugin.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.5</version>
+        </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-lambda-java-core</artifactId>
@@ -204,23 +188,23 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>${findbugs.maven.plugin.version}</version>
-                <configuration>
-                    <effort>Max</effort>
-                    <threshold>Low</threshold>
-                    <xmlOutput>true</xmlOutput>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.codehaus.mojo</groupId>-->
+<!--                <artifactId>findbugs-maven-plugin</artifactId>-->
+<!--                <version>${findbugs.maven.plugin.version}</version>-->
+<!--                <configuration>-->
+<!--                    <effort>Max</effort>-->
+<!--                    <threshold>Low</threshold>-->
+<!--                    <xmlOutput>true</xmlOutput>-->
+<!--                </configuration>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <goals>-->
+<!--                            <goal>check</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
