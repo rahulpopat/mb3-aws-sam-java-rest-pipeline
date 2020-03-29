@@ -1,0 +1,301 @@
+openapi: 3.0.0
+info:
+  title: mb3-aws-sam-java-rest-deployment
+  contact: {}
+  version: '1.0'
+servers:
+- url: https://jrm15a6w41.execute-api.us-east-1.amazonaws.com//Prod
+  variables: {}
+- url: https://xoy4d878q5.execute-api.us-east-1.amazonaws.com//Prod
+  variables: {}
+- url: https://5gbsraqwdrerzgjg5zbdl3tadu.appsync-api.us-east-1.amazonaws.com
+  variables: {}
+paths:
+  /bookings/:booking_id:
+    get:
+      tags:
+      - '{booking id}'
+      summary: Get booking by id
+      operationId: Getbookingbyid
+      parameters:
+      - name: booking_id
+        in: query
+        description: ''
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+      deprecated: false
+      servers:
+      - url: https://jrm15a6w41.execute-api.us-east-1.amazonaws.com//Prod
+        variables: {}
+    post:
+      tags:
+      - '{booking id}'
+      summary: Update booking by id
+      operationId: Updatebookingbyid
+      parameters:
+      - name: booking_id
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Updatebooking'
+        required: true
+        x-send-file-in-body: false
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+      deprecated: false
+      security: []
+      servers:
+      - url: https://jrm15a6w41.execute-api.us-east-1.amazonaws.com//Prod
+        variables: {}
+    delete:
+      tags:
+      - '{booking id}'
+      summary: Delete booking by id
+      operationId: Deletebookingbyid
+      parameters:
+      - name: booking_id
+        in: query
+        description: ''
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+      deprecated: false
+      security: []
+      servers:
+      - url: https://jrm15a6w41.execute-api.us-east-1.amazonaws.com//Prod
+        variables: {}
+  /bookings:
+    get:
+      tags:
+      - bookings
+      summary: Get all bookings
+      operationId: Getallbookings
+      parameters: []
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+      deprecated: false
+      servers:
+      - url: https://jrm15a6w41.execute-api.us-east-1.amazonaws.com//Prod
+        variables: {}
+    post:
+      tags:
+      - bookings
+      summary: Create booking
+      operationId: Createbooking
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Createbooking'
+            example:
+              bookingOutboundFlightId: e3953d85-7795-4e1f-810b-d512cd79973b
+              paymentToken: token
+              customer: rahul
+              checkedIn: false
+              status: CONFIRMED
+        required: true
+        x-send-file-in-body: false
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+      deprecated: false
+      security: []
+      servers:
+      - url: https://jrm15a6w41.execute-api.us-east-1.amazonaws.com//Prod
+        variables: {}
+  /graphql:
+    post:
+      tags:
+      - flights
+      summary: allFlights
+      operationId: allFlights
+      parameters:
+      - name: x-api-key
+        in: header
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: da2-xu47musclbfh7pgjn73ni2v2oy
+      responses:
+        200:
+          description: ''
+          headers: {}
+      deprecated: false
+      servers:
+      - url: https://5gbsraqwdrerzgjg5zbdl3tadu.appsync-api.us-east-1.amazonaws.com
+        variables: {}
+components:
+  schemas:
+    Updatebooking:
+      title: Updatebooking
+      required:
+      - customer
+      - checkedIn
+      - status
+      type: object
+      properties:
+        customer:
+          type: string
+        checkedIn:
+          type: boolean
+        status:
+          type: string
+      example:
+        customer: richard
+        checkedIn: true
+        status: CONFIRMED
+    Createbooking:
+      title: Createbooking
+      required:
+      - bookingOutboundFlightId
+      - paymentToken
+      - customer
+      - checkedIn
+      - status
+      type: object
+      properties:
+        bookingOutboundFlightId:
+          type: string
+        paymentToken:
+          type: string
+        customer:
+          type: string
+        checkedIn:
+          type: boolean
+        status:
+          type: string
+      example:
+        bookingOutboundFlightId: e3953d85-7795-4e1f-810b-d512cd79973b
+        paymentToken: token
+        customer: hussain
+        checkedIn: false
+        status: CONFIRMED
+    Booking:
+      title: Booking
+      required:
+      - id
+      - bookingOutboundFlightId
+      - checkedIn
+      - customer
+      - paymentToken
+      - status
+      - bookingReference
+      - createdAt
+      - updatedAt
+      type: object
+      properties:
+        id:
+          type: string
+          xml:
+            attribute: true
+            wrapped: false
+        bookingOutboundFlightId:
+          type: string
+          xml:
+            attribute: true
+            wrapped: false
+        checkedIn:
+          type: boolean
+          xml:
+            attribute: true
+            wrapped: false
+        customer:
+          type: string
+          xml:
+            attribute: true
+            wrapped: false
+        paymentToken:
+          type: string
+          xml:
+            attribute: true
+            wrapped: false
+        status:
+          type: string
+          xml:
+            attribute: true
+            wrapped: false
+        bookingReference:
+          type: string
+          xml:
+            attribute: true
+            wrapped: false
+        createdAt:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+            wrapped: false
+        updatedAt:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+            wrapped: false
+      description: ''
+      example:
+        id: 7b4e212c-5a37-4414-8148-88530f9ae64a
+        bookingOutboundFlightId: e3953d85-7795-4e1f-810b-d512cd79973b
+        checkedIn: false
+        customer: mike
+        paymentToken: token
+        status: CONFIRMED
+        bookingReference: CFAT3
+        createdAt: 2020-03-28T16:58:12Z
+        updatedAt: 2020-03-28T16:58:12Z
+tags:
+- name: '{booking id}'
+- name: bookings
+- name: flights

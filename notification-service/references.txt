@@ -1,0 +1,2 @@
+https://docs.amazonaws.cn/en_us/amazondynamodb/latest/developerguide/Streams.Lambda.Tutorial.html
+https://docs.aws.amazon.com/lambda/latest/dg/with-ddb-example.html
