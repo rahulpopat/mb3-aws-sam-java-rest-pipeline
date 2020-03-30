@@ -4,11 +4,7 @@ info:
   contact: {}
   version: '1.0'
 servers:
-- url: https://jrm15a6w41.execute-api.us-east-1.amazonaws.com//Prod
-  variables: {}
-- url: https://xoy4d878q5.execute-api.us-east-1.amazonaws.com//Prod
-  variables: {}
-- url: https://5gbsraqwdrerzgjg5zbdl3tadu.appsync-api.us-east-1.amazonaws.com
+- url: https://jrm15a6w41.execute-api.us-east-1.amazonaws.com/Prod
   variables: {}
 paths:
   /bookings/:booking_id:
@@ -37,7 +33,7 @@ paths:
                 $ref: '#/components/schemas/Booking'
       deprecated: false
       servers:
-      - url: https://jrm15a6w41.execute-api.us-east-1.amazonaws.com//Prod
+      - url: https://jrm15a6w41.execute-api.us-east-1.amazonaws.com/Prod
         variables: {}
     post:
       tags:
@@ -72,7 +68,7 @@ paths:
       deprecated: false
       security: []
       servers:
-      - url: https://jrm15a6w41.execute-api.us-east-1.amazonaws.com//Prod
+      - url: https://jrm15a6w41.execute-api.us-east-1.amazonaws.com/Prod
         variables: {}
     delete:
       tags:
@@ -100,7 +96,7 @@ paths:
       deprecated: false
       security: []
       servers:
-      - url: https://jrm15a6w41.execute-api.us-east-1.amazonaws.com//Prod
+      - url: https://jrm15a6w41.execute-api.us-east-1.amazonaws.com/Prod
         variables: {}
   /bookings:
     get:
@@ -154,28 +150,6 @@ paths:
       security: []
       servers:
       - url: https://jrm15a6w41.execute-api.us-east-1.amazonaws.com//Prod
-        variables: {}
-  /graphql:
-    post:
-      tags:
-      - flights
-      summary: allFlights
-      operationId: allFlights
-      parameters:
-      - name: x-api-key
-        in: header
-        required: true
-        style: simple
-        schema:
-          type: string
-          example: da2-xu47musclbfh7pgjn73ni2v2oy
-      responses:
-        200:
-          description: ''
-          headers: {}
-      deprecated: false
-      servers:
-      - url: https://5gbsraqwdrerzgjg5zbdl3tadu.appsync-api.us-east-1.amazonaws.com
         variables: {}
 components:
   schemas:
@@ -298,4 +272,3 @@ components:
 tags:
 - name: '{booking id}'
 - name: bookings
-- name: flights
