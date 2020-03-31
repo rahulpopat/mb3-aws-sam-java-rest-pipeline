@@ -4,7 +4,7 @@ info:
   title: mb3-aws-sam-java-rest-deployment
   contact: {}
 host: jrm15a6w41.execute-api.us-east-1.amazonaws.com
-basePath: //Prod
+basePath: /Prod
 schemes:
 - https
 consumes:
@@ -122,24 +122,6 @@ paths:
             $ref: '#/definitions/Booking'
           headers: {}
       security: []
-  /graphql:
-    post:
-      summary: allFlights
-      tags:
-      - flights
-      operationId: allFlights
-      deprecated: false
-      produces:
-      - application/json
-      parameters:
-      - name: x-api-key
-        in: header
-        required: true
-        type: string
-      responses:
-        200:
-          description: ''
-          headers: {}
 definitions:
   Updatebooking:
     title: Updatebooking
@@ -233,4 +215,3 @@ definitions:
 tags:
 - name: '{booking id}'
 - name: bookings
-- name: flights
