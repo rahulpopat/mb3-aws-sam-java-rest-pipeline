@@ -1,0 +1,223 @@
+﻿schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+type Booking {
+  bookingReference: String
+  checkedIn: Boolean
+  createdAt: String
+  customer: String
+  id: ID!
+  outboundFlight: Flight! @connection
+  paymentToken: String!
+  status: BookingStatus!
+}
+
+type BookingConnection {
+  items: [Booking]
+  nextToken: String
+}
+
+type Flight {
+  arrivalAirportCode: String!
+  arrivalAirportName: String!
+  arrivalCity: String!
+  arrivalDate: String!
+  arrivalLocale: String!
+  departureAirportCode: String!
+  departureAirportName: String!
+  departureCity: String!
+  departureDate: String!
+  departureLocale: String!
+  flightNumber: Int!
+  id: ID!
+  seatAllocation: Int
+  seatCapacity: Int!
+  ticketCurrency: String!
+  ticketPrice: Int!
+}
+
+type FlightConnection {
+  items: [Flight]
+  nextToken: String
+}
+
+type Mutation {
+  createBooking(input: CreateBookingInput!): Booking
+  createFlight(input: CreateFlightInput!): Flight
+  deleteBooking(input: DeleteBookingInput!): Booking
+  deleteFlight(input: DeleteFlightInput!): Flight
+  updateBooking(input: UpdateBookingInput!): Booking
+  updateFlight(input: UpdateFlightInput!): Flight
+}
+
+type Query {
+  allFlights: [Flight]
+  getBooking(id: ID!): Booking
+  getFlight(id: ID!): Flight
+  listBookings(filter: TableBookingFilterInput, limit: Int, nextToken: String): BookingConnection
+  listFlights(filter: TableFlightFilterInput, limit: Int, nextToken: String): FlightConnection
+}
+
+type Subscription {
+  onCreateBooking(checkedIn: Boolean, createdAt: String, customer: String, id: ID, paymentToken: String): Booking @aws_subscribe(mutations : ["createBooking"])
+  onCreateFlight(departureAirportCode: String, departureAirportName: String, departureCity: String, departureDate: String, id: ID): Flight @aws_subscribe(mutations : ["createFlight"])
+  onDeleteBooking(checkedIn: Boolean, createdAt: String, customer: String, id: ID, paymentToken: String): Booking @aws_subscribe(mutations : ["deleteBooking"])
+  onDeleteFlight(departureAirportCode: String, departureAirportName: String, departureCity: String, departureDate: String, id: ID): Flight @aws_subscribe(mutations : ["deleteFlight"])
+  onUpdateBooking(checkedIn: Boolean, createdAt: String, customer: String, id: ID, paymentToken: String): Booking @aws_subscribe(mutations : ["updateBooking"])
+  onUpdateFlight(departureAirportCode: String, departureAirportName: String, departureCity: String, departureDate: String, id: ID): Flight @aws_subscribe(mutations : ["updateFlight"])
+}
+
+enum BookingStatus {
+  CANCELLED
+  CONFIRMED
+  UNCONFIRMED
+}
+
+input CreateBookingInput {
+  bookingOutboundFlightId: ID!
+  checkedIn: Boolean
+  customer: String
+  id: ID
+  paymentToken: String!
+  status: BookingStatus
+}
+
+input CreateFlightInput {
+  arrivalAirportCode: String!
+  arrivalAirportName: String!
+  arrivalCity: String!
+  arrivalDate: String!
+  arrivalLocale: String!
+  departureAirportCode: String!
+  departureAirportName: String!
+  departureCity: String!
+  departureDate: String!
+  departureLocale: String!
+  flightNumber: Int!
+  seatAllocation: Int
+  seatCapacity: Int!
+  ticketCurrency: String!
+  ticketPrice: Int!
+}
+
+input DeleteBookingInput {
+  id: ID!
+}
+
+input DeleteFlightInput {
+  id: ID!
+}
+
+input TableBookingFilterInput {
+  bookingReference: TableStringFilterInput
+  checkedIn: TableBooleanFilterInput
+  createdAt: TableStringFilterInput
+  customer: TableStringFilterInput
+  id: TableIDFilterInput
+  paymentToken: TableStringFilterInput
+}
+
+input TableBooleanFilterInput {
+  eq: Boolean
+  ne: Boolean
+}
+
+input TableFlightFilterInput {
+  arrivalAirportCode: TableStringFilterInput
+  arrivalAirportName: TableStringFilterInput
+  arrivalCity: TableStringFilterInput
+  arrivalDate: TableStringFilterInput
+  arrivalLocale: TableStringFilterInput
+  departureAirportCode: TableStringFilterInput
+  departureAirportName: TableStringFilterInput
+  departureCity: TableStringFilterInput
+  departureDate: TableStringFilterInput
+  departureLocale: TableStringFilterInput
+  flightNumber: TableIntFilterInput
+  id: TableIDFilterInput
+  seatAllocation: TableIntFilterInput
+  seatCapacity: TableIntFilterInput
+  ticketCurrency: TableStringFilterInput
+  ticketPrice: TableIntFilterInput
+}
+
+input TableFloatFilterInput {
+  between: [Float]
+  contains: Float
+  eq: Float
+  ge: Float
+  gt: Float
+  le: Float
+  lt: Float
+  ne: Float
+  notContains: Float
+}
+
+input TableIDFilterInput {
+  beginsWith: ID
+  between: [ID]
+  contains: ID
+  eq: ID
+  ge: ID
+  gt: ID
+  le: ID
+  lt: ID
+  ne: ID
+  notContains: ID
+}
+
+input TableIntFilterInput {
+  between: [Int]
+  contains: Int
+  eq: Int
+  ge: Int
+  gt: Int
+  le: Int
+  lt: Int
+  ne: Int
+  notContains: Int
+}
+
+input TableStringFilterInput {
+  beginsWith: String
+  between: [String]
+  contains: String
+  eq: String
+  ge: String
+  gt: String
+  le: String
+  lt: String
+  ne: String
+  notContains: String
+}
+
+input UpdateBookingInput {
+  bookingReference: String
+  checkedIn: Boolean
+  createdAt: String
+  customer: String
+  id: ID!
+  paymentToken: String
+}
+
+input UpdateFlightInput {
+  arrivalAirportCode: String
+  arrivalAirportName: String
+  arrivalCity: String
+  arrivalDate: String
+  arrivalLocale: String
+  departureAirportCode: String
+  departureAirportName: String
+  departureCity: String
+  departureDate: String
+  departureLocale: String
+  flightNumber: Int
+  id: ID!
+  seatAllocation: Int
+  seatCapacity: Int
+  ticketCurrency: String
+  ticketPrice: Int
+}
