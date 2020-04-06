@@ -71,9 +71,16 @@ public class GetBookingsHandler implements BookingRequestStreamHandler {
 
         BookingPage page = bookingDao.getBookings(exclusiveStartKeyQueryParameter);
         //TODO handle exceptions
+
         objectMapper.writeValue(output, new GatewayResponse<>(
                 objectMapper.writeValueAsString(
                         new GetBookingsResponse(page.getLastEvaluatedKey(), page.getBookings())),
                 APPLICATION_JSON, SC_OK));
     }
+
+//    private void setheaders() {
+//        APPLICATION_JSON.put("Access-Control-Allow-Origin", "*");
+//        APPLICATION_JSON.put("Access-Control-Allow-Methods", "OPTIONS,POST,GET");
+//        APPLICATION_JSON.put("Content-Type", "application/json");
+//    }
 }

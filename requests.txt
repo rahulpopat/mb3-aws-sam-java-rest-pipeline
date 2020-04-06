@@ -1,0 +1,4 @@
+{
+	"query": "mutation flight1 {createFlight(input:{departureDate:\\"2019-12-02T08:00+0000\\",departureAirportCode:\\"LGW\\",departureAirportName:\\"London Gatwick\\",departureCity:\\"London\\",departureLocale:\\"Europe/London\\",arrivalDate:\\"2019-12-02T10:15+0000\\",arrivalAirportCode:\\"MAD\\",arrivalAirportName:\\"Madrid Barajas\\",arrivalCity:\\"Madrid\\",arrivalLocale:\\"Europe/Madrid\\",ticketPrice:100,ticketCurrency:\\"EUR\\",flightNumber:1830,seatCapacity: 10}){id}}",
+	"variables": {}
+}:q

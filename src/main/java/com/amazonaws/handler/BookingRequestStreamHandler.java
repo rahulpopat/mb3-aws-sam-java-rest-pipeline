@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public interface BookingRequestStreamHandler extends RequestStreamHandler {
@@ -33,8 +35,13 @@ public interface BookingRequestStreamHandler extends RequestStreamHandler {
     int SC_NOT_FOUND = 404;
     int SC_CONFLICT = 409;
     int SC_INTERNAL_SERVER_ERROR = 500;
-    Map<String, String> APPLICATION_JSON = Collections.singletonMap("Content-Type",
-            "application/json");
+//    Map<String, String> APPLICATION_JSON = Collections.singletonMap("Content-Type",
+//            "application/json");
+    Map<String, String> APPLICATION_JSON = new HashMap<String, String>() {{
+            put("Access-Control-Allow-Origin", "*");
+            put("Access-Control-Allow-Methods", "OPTIONS,POST,GET");
+            put("Content-Type", "application/json");
+        }};
     ErrorMessage REQUEST_WAS_NULL_ERROR
             = new ErrorMessage("Request was null", SC_BAD_REQUEST);
     ErrorMessage BOOKING_ID_WAS_NOT_SET
