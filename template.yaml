@@ -38,6 +38,7 @@ Resources:
           Properties:
             Path: /bookings/{booking_id}
             Method: get
+            TracingEnabled: true
   GetBookingsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -54,6 +55,7 @@ Resources:
           Properties:
             Path: /bookings
             Method: get
+            TracingEnabled: true
   UpdateBookingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -70,6 +72,7 @@ Resources:
           Properties:
             Path: /bookings/{booking_id}
             Method: post
+            TracingEnabled: true
   DeleteBookingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -86,6 +89,7 @@ Resources:
           Properties:
             Path: /bookings/{booking_id}
             Method: delete
+            TracingEnabled: true
   CreateBookingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -102,6 +106,7 @@ Resources:
           Properties:
             Path: /bookings
             Method: post
+            TracingEnabled: true
 
 #  BookingsTable:
 #    Type: AWS::DynamoDB::Table
