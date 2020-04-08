@@ -22,12 +22,6 @@ Globals:
         AllowOrigin: "'*'"
 
 Resources:
-  BasicAWSApiGateway:
-    Type: AWS::Serverless::Api
-    Properties:
-      Name: mb3-aws-sam-java-rest-pipeline-Prod
-      StageName: Prod
-      TracingEnabled: true
   GetBookingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -42,7 +36,6 @@ Resources:
         GetBooking:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            RestApiId: !Ref BasicAWSApiGateway
             Path: /bookings/{booking_id}
             Method: get
   GetBookingsFunction:
@@ -59,7 +52,6 @@ Resources:
         GetBookings:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            RestApiId: !Ref BasicAWSApiGateway
             Path: /bookings
             Method: get
   UpdateBookingFunction:
@@ -76,7 +68,6 @@ Resources:
         UpdateBooking:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            RestApiId: !Ref BasicAWSApiGateway
             Path: /bookings/{booking_id}
             Method: post
   DeleteBookingFunction:
@@ -93,7 +84,6 @@ Resources:
         DeleteBooking:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            RestApiId: !Ref BasicAWSApiGateway
             Path: /bookings/{booking_id}
             Method: delete
   CreateBookingFunction:
@@ -110,7 +100,6 @@ Resources:
         CreateBooking:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            RestApiId: !Ref BasicAWSApiGateway
             Path: /bookings
             Method: post
 
@@ -127,9 +116,9 @@ Resources:
 #      BillingMode: PAY_PER_REQUEST
 
 Outputs:
-#    HelloWorldApi:
-#      Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-#      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+    HelloWorldApi:
+      Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
 
     GetBookingFunction:
       Description: "GetBooking Lambda Function ARN"
