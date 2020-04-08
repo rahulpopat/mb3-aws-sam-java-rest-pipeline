@@ -295,12 +295,12 @@ public class BookingDao {
                     "Invalid updatedAt attribute");
         }
 
-//        try {
-//            builder.bookingReference(item.get("bookingReference").s());
-//        } catch (NullPointerException e) {
-//            throw new IllegalStateException(
-//                    "Invalid bookingReference attribute");
-//        }
+        try {
+            builder.bookingReference(item.get("bookingReference").s());
+        } catch (NullPointerException e) {
+            throw new IllegalStateException(
+                    "Invalid bookingReference attribute");
+        }
 
         return builder.build();
     }
