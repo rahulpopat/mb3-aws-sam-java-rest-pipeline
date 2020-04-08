@@ -22,6 +22,12 @@ Globals:
         AllowOrigin: "'*'"
 
 Resources:
+  BasicAWSApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: Basic AWS Api Gateway
+      StageName: Prod
+      TracingEnabled: true
   GetBookingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -36,9 +42,9 @@ Resources:
         GetBooking:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
+            RestApiId: !Ref BasicAWSApiGateway
             Path: /bookings/{booking_id}
             Method: get
-            TracingEnabled: true
   GetBookingsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -53,9 +59,9 @@ Resources:
         GetBookings:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
+            RestApiId: !Ref BasicAWSApiGateway
             Path: /bookings
             Method: get
-            TracingEnabled: true
   UpdateBookingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -70,9 +76,9 @@ Resources:
         UpdateBooking:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
+            RestApiId: !Ref BasicAWSApiGateway
             Path: /bookings/{booking_id}
             Method: post
-            TracingEnabled: true
   DeleteBookingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -87,9 +93,9 @@ Resources:
         DeleteBooking:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
+            RestApiId: !Ref BasicAWSApiGateway
             Path: /bookings/{booking_id}
             Method: delete
-            TracingEnabled: true
   CreateBookingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -104,9 +110,9 @@ Resources:
         CreateBooking:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
+            RestApiId: !Ref BasicAWSApiGateway
             Path: /bookings
             Method: post
-            TracingEnabled: true
 
 #  BookingsTable:
 #    Type: AWS::DynamoDB::Table
