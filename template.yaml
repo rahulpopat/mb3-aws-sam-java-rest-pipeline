@@ -25,7 +25,7 @@ Resources:
   BasicAWSApiGateway:
     Type: AWS::Serverless::Api
     Properties:
-      Name: Basic AWS Api Gateway
+      Name: mb3-aws-sam-java-rest-pipeline-Prod
       StageName: Prod
       TracingEnabled: true
   GetBookingFunction:
