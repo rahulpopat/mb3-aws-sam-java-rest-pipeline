@@ -27,7 +27,7 @@ Resources:
     Properties:
       CodeUri: ./
 #      CodeUri: target/mb3-aws-sam-java-rest-1.0.0.jar
-      Handler: com.amazonaws.handler.GetBookingHandler::handleRequest
+      Handler: com.amazonaws.handlehandleRequestr.GetBookingHandler::handleRequest
       Runtime: java8
       Tracing: Active
       Policies:
